@@ -13,22 +13,22 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Node.js (atau bahasa lain yang digunakan)
+    - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'  # Ganti dengan versi yang digunakan dalam project
+        node-version: '14'  # Ganti dengan versi Node.js yang kamu pakai
 
     - name: Install dependencies
       run: |
-        npm install  # Jika menggunakan npm, ganti dengan perintah sesuai bahasa yang digunakan
+        npm install
 
     - name: Run unit tests
       run: |
-        npm test  # Ganti dengan perintah testing yang digunakan dalam project
+        npm test
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build  # Hanya dijalankan jika build dan test sukses
+    needs: build
 
     steps:
     - name: Checkout code
@@ -37,13 +37,13 @@ jobs:
     - name: Set up SSH
       uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}  # Menambahkan SSH key ke GitHub secrets
+        ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
 
     - name: Deploy to EC2
       run: |
         ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-          cd /path/to/your/app  # Ganti dengan path aplikasi di EC2
+          cd /var/www/html/front-end   # <-- Sesuaikan ke folder aplikasi kamu!
           git pull origin main
-          npm install  # Atau perintah lain untuk mempersiapkan aplikasi
-          pm2 restart app  # Restart aplikasi menggunakan pm2 (atau perintah yang sesuai)
+          npm install                  # Jika ini front-end static html, hapus baris ini
+          pm2 restart all || pm2 start npm --name "your-app-name" -- start
         EOF
