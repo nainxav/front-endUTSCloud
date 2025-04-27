@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Trigger jika ada push ke branch 'main'
+      - main
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'  # Ganti dengan versi Node.js yang kamu pakai
+        node-version: '14'
 
     - name: Install dependencies
       run: |
@@ -42,8 +42,8 @@ jobs:
     - name: Deploy to EC2
       run: |
         ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-          cd /var/www/html/front-end   # <-- Sesuaikan ke folder aplikasi kamu!
+          cd /var/www/html/front-end
           git pull origin main
-          npm install                  # Jika ini front-end static html, hapus baris ini
+          npm install
           pm2 restart all || pm2 start npm --name "your-app-name" -- start
         EOF
